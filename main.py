@@ -167,5 +167,91 @@ def user(uid: int):
         return '', 204
 
 
+@app.route('/orders', methods=['GET', 'POST'])
+def all_orders():
+    if request.method == "GET":
+        result = []
+        for order in Order.query.all():
+            result.append(order.to_dict())
+        return jsonify(result)
+
+    elif request.method == 'POST':
+        order_data_new = json.loads(request.data)
+        new_orders = Order(
+            id=order_data_new["id"],
+            name=order_data_new["name"],
+            description=order_data_new["description"],
+            start_date=order_data_new["start_date"],
+            end_date=order_data_new["end_date"],
+            address=order_data_new["address"],
+            price=order_data_new["price"],
+            customer_id=order_data_new["customer_id"],
+            executor_id=order_data_new["executor_id"]
+        )
+        db. session.add(new_orders)
+        db. session.commit()
+        return "", 201
+
+
+@app.route("/orders/<int:uid>", methods=["GET", "PUT", "DELETE"])
+def get_order(uid: int):
+    if request.method == 'GET':
+        return jsonify(Order.query.get(uid).to_dict())
+
+    elif request.method == 'PUT':
+        order_data_new = json.loads(request.data)
+        order = Order.query.get(uid)
+        order.id = order_data_new['id']
+        order.name = order_data_new["name"]
+        order.description = order_data_new["description"]
+        order.start_date = order_data_new['start_date']
+        order.end_date = order_data_new['end_date']
+        order.address = order_data_new['address']
+        order.price = order_data_new['price']
+        order.customer_id = order_data_new["customer_id"]
+        order.executor_id = order_data_new["executor_id"]
+
+        db.session.add(order)
+        db. session.commit()
+        return '', 204
+
+
+@app.route('/offers', methods=['GET', 'POST'])
+def all_offers():
+    if request.method == "GET":
+        result = []
+        for offer in Offer.query.all():
+            result.append(offer.to_dict())
+        return jsonify(result)
+
+    elif request.method == 'POST':
+        offer_data_new = json.loads(request.data)
+        new_offers = Offer(
+            id=offer_data_new["id"],
+            order_id=offer_data_new["order_id"],
+            executor_id=offer_data_new["executor_id"]
+        )
+        db. session.add(new_offers)
+        db. session.commit()
+        return "", 201
+
+
+@app.route("/offers/<int:uid>", methods=["GET", "PUT", "DELETE"])
+def get_offer(uid: int):
+    if request.method == 'GET':
+        return jsonify(Offer.query.get(uid).to_dict())
+
+    elif request.method == 'PUT':
+        offer_data_new = json.loads(request.data)
+        offer = Offer.query.get(uid)
+        offer.id = offer_data_new['id']
+        offer.order_id = offer_data_new["order_id"],
+        offer.executor_id = offer_data_new["executor_id"]
+
+        db.session.add(offer)
+        db. session.commit()
+        return '', 204
+
+
 if __name__ == "__main__":
     app.run()
